@@ -1,49 +1,47 @@
 ﻿using System.Drawing;
 
-namespace LengthOfString.Core
+namespace LengthOfString.Core;
+
+public class CatDownloader
 {
+    private readonly CatCounter _catCounter = Services.CatCounter;
 
-    public class CatDownloader
+    public void ToSave()
     {
-        private readonly CatCounter _catCounter = Services.CatCounter;
+        Directory.CreateDirectory("tmp\\goodcats");
 
-        public void ToSave()
+        foreach (var id in File.ReadAllLines("catIds.txt"))
         {
-            Directory.CreateDirectory("tmp\\goodcats");
+            DownloadCat(id);
+        }
 
-            foreach (var id in File.ReadAllLines("catIds.txt"))
+        foreach (var id in File.ReadAllLines("catIds.txt"))
+        {
+            string fileName = $"tmp\\{id}.png";
+
+            if (IsCat(fileName))
             {
-                DownloadCat(id);
-            }
+                File.AppendAllLines("tmp\\saveIds.txt", new[] { id });
 
-            foreach (var id in File.ReadAllLines("catIds.txt"))
-            {
-                string fileName = $"tmp\\{id}.png";
-
-                if (IsCat(fileName))
-                {
-                    File.AppendAllLines("tmp\\saveIds.txt", new[] { id });
-
-                    File.Copy(fileName, $"tmp\\goodcats\\{id}.png");
-                }
+                File.Copy(fileName, $"tmp\\goodcats\\{id}.png");
             }
         }
+    }
 
-        private static void DownloadCat(string catId)
-        {
-            string urlToCat = $"https://cataas.com/cat/{catId}?height={300}";
+    private static void DownloadCat(string catId)
+    {
+        string urlToCat = $"https://cataas.com/cat/{catId}?height={300}";
 
-            string fileName = $"tmp\\{catId}.png";
+        string fileName = $"tmp\\{catId}.png";
 
-            using var client = new HttpClient();
-            byte[] fileBytes = client.GetByteArrayAsync(urlToCat).Result;
-            File.WriteAllBytes(fileName, fileBytes);
-        }
+        using var client = new HttpClient();
+        byte[] fileBytes = client.GetByteArrayAsync(urlToCat).Result;
+        File.WriteAllBytes(fileName, fileBytes);
+    }
 
 
-        private bool IsCat(string fileName)
-        {
-            return _catCounter.IsGoodCat(Image.FromFile(fileName));
-        }
+    private bool IsCat(string fileName)
+    {
+        return _catCounter.IsGoodCat(Image.FromFile(fileName));
     }
 }

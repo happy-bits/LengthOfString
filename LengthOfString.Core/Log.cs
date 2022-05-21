@@ -1,21 +1,20 @@
-﻿namespace LengthOfString.Core
+﻿namespace LengthOfString.Core;
+
+public class Log
 {
-    public class Log
+    private readonly bool _active;
+
+    public Log(bool active)
     {
-        private readonly bool _active;
+        _active = active;
+    }
 
-        public Log(bool active)
+    public void WriteLine(object o)
+    {
+        if (_active)
         {
-            _active = active;
-        }
-
-        public void WriteLine(object o)
-        {
-            if (_active)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(o);
-            }
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(o);
         }
     }
 }
